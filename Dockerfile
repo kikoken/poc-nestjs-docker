@@ -1,17 +1,19 @@
 FROM node:alpine
-
+ENV NODE_ENV production
 USER node
 
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
-COPY . /home/node/app
+COPY package.json .
+
+USER node
+COPY --chown=node:node . .
+
 RUN npm install --production
 
-# CMD [ "npm", "start" ]
-CMD ["node", "dist/server.js"]
-EXPOSE 3000
+COPY dist/ .
 
-# Install development packages if NODE_ENV is set to "development"
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
-RUN if [ "$NODE_ENV" == "development" ]; then npm install ; fi
+EXPOSE 3000
+CMD ["node", "main.js"]
+
+USER node
